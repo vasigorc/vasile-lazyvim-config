@@ -64,7 +64,7 @@ return {
           -- Add syntax settings
           vim.opt_local.syntax = "asciidoc"
           -- Set textwidth for better formatting
-          vim.opt_local.textwidth = 80
+          vim.opt_local.textwidth = 100
           -- Enable auto-formatting
           vim.opt_local.formatoptions:append("tcqn")
           -- Set comment format
