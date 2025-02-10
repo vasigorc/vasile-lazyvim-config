@@ -7,3 +7,8 @@ vim.g.lazyvim_python_lsp = "pyright"
 vim.g.lazyvim_python_ruff = "ruff"
 vim.g.python_dap_enabled = false -- Disable DAP loading
 vim.opt.winbar = "%=%m %f"
+-- In config/options.lua
+vim.opt.expandtab = true
+vim.opt.tabstop = 2
+vim.opt.softtabstop = 2
+vim.opt.shiftwidth = 2
