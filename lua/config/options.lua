@@ -12,3 +12,6 @@ vim.opt.expandtab = true
 vim.opt.tabstop = 2
 vim.opt.softtabstop = 2
 vim.opt.shiftwidth = 2
+-- Set up regular line numbers (non-relative)
+vim.opt.number = true -- Show line numbers
+vim.opt.relativenumber = false -- Disable relative line numbers
