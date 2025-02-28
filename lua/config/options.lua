@@ -15,3 +15,6 @@ vim.opt.shiftwidth = 2
 -- Set up regular line numbers (non-relative)
 vim.opt.number = true -- Show line numbers
 vim.opt.relativenumber = false -- Disable relative line numbers
+-- Enable the option to require a Prettier config file
+-- If no prettier config file is found, the formatter will not be used
+vim.g.lazyvim_prettier_needs_config = false

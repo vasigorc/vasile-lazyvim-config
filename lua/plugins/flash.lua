@@ -15,8 +15,9 @@ return {
       },
     },
   },
-  -- Remove the S mapping but keep other default Flash.nvim mappings
+  -- Remove the following mappings but keep other default Flash.nvim mappings
   keys = {
     { "S", mode = { "n", "x", "o" }, false },
+    { "s", mode = { "n", "x", "o" }, false },
   },
 }
