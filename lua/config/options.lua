@@ -18,3 +18,5 @@ vim.opt.relativenumber = false -- Disable relative line numbers
 -- Enable the option to require a Prettier config file
 -- If no prettier config file is found, the formatter will not be used
 vim.g.lazyvim_prettier_needs_config = false
+-- LSP server to use for Rust
+vim.g.lazyvim_rust_diagnostics = "rust_analyzer"
