@@ -7,13 +7,13 @@ vim.g.lazyvim_python_lsp = "pyright"
 vim.g.lazyvim_python_ruff = "ruff"
 vim.g.python_dap_enabled = false -- Disable DAP loading
 vim.opt.winbar = "%=%m %f"
--- In config/options.lua
-vim.opt.expandtab = true
-vim.opt.tabstop = 2
-vim.opt.softtabstop = 2
-vim.opt.shiftwidth = 2
+-- Try to keep the four lines below commented out, and fiddle with language specific overrides in lua/config/autocmds.lua
+-- vim.opt.expandtab = true
+-- vim.opt.tabstop = 2
+-- vim.opt.softtabstop = 2
+-- vim.opt.shiftwidth = 2
 -- Set up regular line numbers (non-relative)
-vim.opt.number = true -- Show line numbers
+vim.opt.number = true          -- Show line numbers
 vim.opt.relativenumber = false -- Disable relative line numbers
 -- Enable the option to require a Prettier config file
 -- If no prettier config file is found, the formatter will not be used
