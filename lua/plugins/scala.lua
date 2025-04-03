@@ -179,6 +179,11 @@ return {
         map("n", "<leader>dl", function()
           require("dap").run_last()
         end)
+
+        -- Metals commands mappings
+        map("n", "<leader>me", function()
+          require("telescope").extensions.metals.commands()
+        end, { buffer = bufnr, desc = "Metals: Commands via Telescope" })
       end
 
       return metals_config
