@@ -1,5 +1,4 @@
 return {
-  -- Configure additional TypeScript/JavaScript specific settings
   {
     "neovim/nvim-lspconfig",
     opts = {
@@ -33,6 +32,13 @@ return {
         },
       },
     },
+    config = function()
+      require("lspconfig").buf_ls.setup({
+        cmd = { "buf", "beta", "lsp", "--timeout", "0", "--log-format=text" },
+        filetypes = { "proto" },
+        root_dir = require("lspconfig.util").root_pattern("buf.yaml", ".git"),
+      })
+    end,
   },
 
   -- Ensure the necessary tools are installed through Mason
