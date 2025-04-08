@@ -1,3 +1,4 @@
+require("lspconfig").protols.setup({})
 return {
   {
     "neovim/nvim-lspconfig",
@@ -29,6 +30,9 @@ return {
               },
             },
           },
+        },
+        clangd = {
+          filetypes = { "c", "cpp", "objc", "objcpp" }, -- explicitly omitting .proto
         },
       },
     },
