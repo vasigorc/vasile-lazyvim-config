@@ -32,12 +32,6 @@ return {
         },
       },
     },
-    config = function()
-      require("lspconfig").protols.setup({
-        cmd = { "protols" },
-        filetypes = { "proto" },
-      })
-    end,
   },
 
   -- Ensure the necessary tools are installed through Mason
