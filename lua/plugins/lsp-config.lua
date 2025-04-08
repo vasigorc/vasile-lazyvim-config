@@ -33,10 +33,9 @@ return {
       },
     },
     config = function()
-      require("lspconfig").buf_ls.setup({
-        cmd = { "buf", "beta", "lsp", "--timeout", "0", "--log-format=text" },
+      require("lspconfig").protols.setup({
+        cmd = { "protols" },
         filetypes = { "proto" },
-        root_dir = require("lspconfig.util").root_pattern("buf.yaml", ".git"),
       })
     end,
   },
@@ -49,6 +48,7 @@ return {
       vim.list_extend(opts.ensure_installed, {
         "eslint-lsp", -- ESLint LSP
         "prettier", -- Prettier formatter
+        "protols", -- Protobuf support
       })
     end,
   },

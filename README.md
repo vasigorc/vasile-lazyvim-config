@@ -21,6 +21,8 @@ or as a Nix package (as part of your Nix set-up).
 
 - [Optional: for Scala] NeoVm will configure `metals` for you, but you will have to
   manually install `metals` when on a `*.scala` file with `:MetalsInstall`
+- [Optional: for Protocol-Buffers] install [protols](https://github.com/coder3101/protols?tab=readme-ov-file#for-neovim) plugin.
+  Make sure that you have `cargo` version `1.88.0` installed. This plugin requires `edition2024`. I used `rustup`'s `nightly toolchain'.
 
 ### Running inside `nix-shell`
 
