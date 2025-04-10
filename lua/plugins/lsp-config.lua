@@ -50,6 +50,7 @@ return {
         "eslint-lsp", -- ESLint LSP
         "prettier", -- Prettier formatter
         "protols", -- Protobuf support
+        "sql-formatter", -- https://github.com/sql-formatter-org/sql-formatter
       })
     end,
   },
