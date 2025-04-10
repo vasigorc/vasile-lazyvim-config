@@ -34,9 +34,6 @@ return {
         clangd = {
           filetypes = { "c", "cpp", "objc", "objcpp" }, -- explicitly omitting .proto
         },
-        metals = {
-          filetypes = { "scala", "sbt" },
-        },
       },
     },
   },
