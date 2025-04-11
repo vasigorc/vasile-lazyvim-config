@@ -24,4 +24,26 @@ return {
       { "<leader>gm", "<cmd>Git mergetool<cr>", desc = "Git Mergetool" },
     },
   },
+  {
+    "sindrets/diffview.nvim",
+    dependencies = {
+      { "nvim-tree/nvim-web-devicons", lazy = true },
+    },
+
+    cmd = { "DiffviewOpen", "DiffviewClose", "DiffviewToggleFiles", "DiffviewFocusFiles" },
+    keys = {
+      { "<leader>dv", "<cmd>DiffviewOpen<cr>", desc = "DiffView Open" },
+      { "<leader>dc", "<cmd>DiffviewClose<cr>", desc = "DiffView Close" },
+      -- File history for current buffer
+      { "<leader>dh", "<cmd>DiffviewFileHistory %<cr>", desc = "DiffView File History (Current Buffer)" },
+    },
+    opts = {
+      enhanced_diff_hl = true,
+      view = {
+        default = {
+          layout = "diff2_horizontal",
+        },
+      },
+    },
+  },
 }
