@@ -20,6 +20,18 @@ return {
         inline = { adapter = "deepseek" },
         agent = { adapter = "deepseek" },
       },
+      display = {
+        action_palette = {
+          width = 95,
+          height = 10,
+          prompt = "Prompt ",
+          provider = "default",
+          opts = {
+            show_default_actions = true,
+            show_default_prompt_library = true,
+          },
+        },
+      },
     })
   end,
 }
