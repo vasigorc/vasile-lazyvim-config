@@ -19,3 +19,11 @@ autocmd("FileType", {
     vim.bo.softtabstop = 4
   end,
 })
+
+-- Disable auto-formatting for .env files
+autocmd({ "BufRead", "BufNewFile" }, {
+  pattern = { "*.env" },
+  callback = function()
+    vim.b.autoformat = false
+  end,
+})
