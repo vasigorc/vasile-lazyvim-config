@@ -22,8 +22,8 @@ return {
             },
           })
         end,
-        antrhopic = function()
-          return require("codecompanion.adapters").extend("openai", {
+        anthropic = function()
+          return require("codecompanion.adapters").extend("anthropic", {
             env = {
               api_key = os.getenv("ANTHROPIC_API_KEY"),
             },
@@ -31,7 +31,7 @@ return {
         end,
       },
       strategies = {
-        chat = { adapter = "antrhopic" },
+        chat = { adapter = "anthropic" },
         inline = { adapter = "deepseek" },
         agent = { adapter = "deepseek" },
       },
