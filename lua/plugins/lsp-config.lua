@@ -1,9 +1,12 @@
-require("lspconfig").protols.setup({})
 return {
   {
     "neovim/nvim-lspconfig",
     opts = {
       servers = {
+        -- Configure protols to only handle .proto files
+        protols = {
+          filetypes = { "proto" },
+        },
         -- Add any additional tsserver settings here
         tsserver = {
           settings = {
