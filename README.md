@@ -45,3 +45,61 @@ your current project.
 ## How to use this setup
 
 Make sure that you have your [prerequistes](#prerequisites) and then follow the steps from [this page](http://www.lazyvim.org/installation).
+
+## CodeCompanion with Ollama
+
+This LazyVim configuration integrates with [CodeCompanion.nvim](https://github.com/olimorris/codecompanion.nvim) to provide AI-powered coding assistance. By default, it is configured to use [Ollama](https://ollama.com/) with the `qwen3:14b` model, which is a cost-efficient (free) solution for local AI inference.
+
+### Ollama Installation and Model Setup
+
+To use CodeCompanion with Ollama, you need to install Ollama and download the `qwen3:14b` model.
+
+**For Linux (Debian-based):**
+
+1.  **Install Ollama:**
+    ```bash
+    curl -fsSL https://ollama.com/install.sh | sh
+    ```
+2.  **Download the qwen3 model:**
+    ```bash
+    ollama pull qwen3:14b
+    ```
+
+**For macOS:**
+
+1.  **Install Ollama:** Download the macOS application from [ollama.com/download](https://ollama.com/download) and follow the installation instructions.
+2.  **Download the qwen3 model:**
+    ```bash
+    ollama pull qwen3:14b
+    ```
+
+### Switching to Other Models
+
+The default model for CodeCompanion is `qwen3:14b` due to its cost-effectiveness. However, you can easily switch to other models supported by Ollama or other adapters (e.g., OpenAI, DeepSeek, Anthropic) by modifying the `lua/plugins/codecompanion.lua` file.
+
+To change the default model for Ollama, locate the `ollama_qwen` adapter definition and modify the `model` field:
+
+```lua
+        ollama_qwen = function()
+          return require("codecompanion.adapters").extend("ollama", {
+            name = "ollama_qwen",
+            schema = {
+              model = {
+                default = "qwen3:14b", -- Change 'qwen3:14b' to your desired Ollama model
+              },
+            },
+          })
+        end,
+```
+
+To switch to a different adapter (e.g., OpenAI), you would modify the `strategies` section:
+
+```lua
+      strategies = {
+        chat = { adapter = "openai" }, -- Change 'ollama_qwen' to 'openai' or another configured adapter
+        inline = { adapter = "openai" },
+        agent = { adapter = "deepseek" },
+      },
+```
+
+Remember to set the corresponding API key as an environment variable if you are using a paid service like OpenAI, DeepSeek, or Anthropic. For example, for OpenAI, set `OPENAI_API_KEY`.

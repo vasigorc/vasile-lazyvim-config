@@ -8,6 +8,16 @@ return {
   config = function()
     require("codecompanion").setup({
       adapters = {
+        ollama_qwen = function()
+          return require("codecompanion.adapters").extend("ollama", {
+            name = "ollama_qwen",
+            schema = {
+              model = {
+                default = "qwen3:14b",
+              },
+            },
+          })
+        end,
         deepseek = function()
           return require("codecompanion.adapters").extend("deepseek", {
             env = {
@@ -31,8 +41,8 @@ return {
         end,
       },
       strategies = {
-        chat = { adapter = "anthropic" },
-        inline = { adapter = "deepseek" },
+        chat = { adapter = "ollama_qwen" },
+        inline = { adapter = "ollama_qwen" },
         agent = { adapter = "deepseek" },
       },
       display = {
