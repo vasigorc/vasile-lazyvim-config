@@ -27,3 +27,11 @@ autocmd({ "BufRead", "BufNewFile" }, {
     vim.b.autoformat = false
   end,
 })
+
+-- Set ft=hocon for files in resources/
+local hocon_group = vim.api.nvim_create_augroup("hocon", { clear = true })
+autocmd({ "BufNewFile", "BufRead" }, {
+  group = hocon_group,
+  pattern = "*.conf",
+  command = "set ft=hocon",
+})
