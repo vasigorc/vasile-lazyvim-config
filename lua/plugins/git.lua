@@ -36,6 +36,18 @@ return {
       { "<leader>dc", "<cmd>DiffviewClose<cr>", desc = "DiffView Close" },
       -- File history for current buffer
       { "<leader>dh", "<cmd>DiffviewFileHistory %<cr>", desc = "DiffView File History (Current Buffer)" },
+      {
+        "<leader>dbs",
+        function()
+          local branch_list = vim.fn.systemlist("git for-each-ref --format='%(refname:short)' refs/heads/")
+          vim.ui.select(branch_list, { prompt = "Select a branch to compare with:" }, function(choice)
+            if choice then
+              vim.cmd("DiffviewOpen " .. choice .. "...HEAD --imply-local")
+            end
+          end)
+        end,
+        desc = "DiffView against branch",
+      },
     },
     opts = {
       enhanced_diff_hl = true,
