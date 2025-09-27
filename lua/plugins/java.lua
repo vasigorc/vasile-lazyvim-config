@@ -3,7 +3,7 @@ return {
     "mfussenegger/nvim-jdtls",
     dependencies = {
       "neovim/nvim-lspconfig",
-      "williamboman/mason.nvim",
+      "mason-org/mason.nvim",
     },
     config = function()
       local config = {
@@ -63,6 +63,16 @@ return {
         callback = function()
           require("jdtls").start_or_attach(config)
         end,
+      })
+    end,
+  },
+  {
+    "eatgrass/maven.nvim",
+    cmd = { "Maven", "MavenExec" },
+    dependencies = "nvim-lua/plenary.nvim",
+    config = function()
+      require("maven").setup({
+        executable = "mvn",
       })
     end,
   },
