@@ -21,31 +21,33 @@ return {
       { "<leader>ao", "<cmd>AsciiDocPreviewOpen<cr>", desc = "Open AsciiDoc Preview" },
     },
   },
-  -- TreeSitter configuration - combined into a single block
+  -- TreeSitter configuration for AsciiDoc
   {
     "nvim-treesitter/nvim-treesitter",
-    opts = {
-      parser_install_dir = vim.fn.stdpath("data") .. "/treesitter-parser",
-    },
-    config = function(_, opts)
-      -- Add parser_install_dir to rtp
-      vim.opt.rtp:append(opts.parser_install_dir)
+    opts = function(_, opts)
+      -- Add asciidoc to ensure_installed
+      if not opts.ensure_installed then
+        opts.ensure_installed = {}
+      end
+      if not vim.tbl_contains(opts.ensure_installed, "asciidoc") then
+        table.insert(opts.ensure_installed, "asciidoc")
+      end
 
-      -- Setup TreeSitter
-      require("nvim-treesitter.configs").setup(opts)
-
-      -- Configure AsciiDoc parser
-      local parser_config = require("nvim-treesitter.parsers").get_parser_configs()
-      parser_config.asciidoc = {
+      -- Configure the asciidoc parser
+      if not opts.parsers then
+        opts.parsers = {}
+      end
+      opts.parsers.asciidoc = {
         install_info = {
           url = "https://github.com/cathaysia/tree-sitter-asciidoc",
-          files = { "parser.c" }, -- Changed from src/parser.c
+          files = { "parser.c" },
           branch = "master",
           generate_requires_npm = true,
         },
         filetype = "asciidoc",
       }
-
+    end,
+    config = function()
       -- File type detection
       vim.filetype.add({
         extension = {
