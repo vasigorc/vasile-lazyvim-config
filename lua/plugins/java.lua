@@ -6,6 +6,18 @@ return {
       "mason-org/mason.nvim",
     },
     config = function()
+      -- Find the project root directory
+      local root_markers = { ".git", "mvnw", "gradlew", "pom.xml" }
+      local root_dir = require("jdtls.setup").find_root(root_markers)
+      if not root_dir then
+        return
+      end
+
+      -- Use a unique name for the workspace directory based on the project root.
+      -- This prevents conflicts between projects.
+      local workspace_dir = vim.fn.fnamemodify(root_dir, ":p:h:t")
+      local data_dir = vim.fn.stdpath("data") .. "/jdtls-workspace/" .. workspace_dir
+
       local config = {
         cmd = {
           "/Users/vasilegorcinschi/.sdkman/candidates/java/21.0.7-tem/bin/java",
@@ -25,9 +37,9 @@ return {
           "-configuration",
           vim.fn.glob("~/.local/share/nvim/mason/packages/jdtls/config_mac"),
           "-data",
-          vim.fn.getcwd() .. "/.workspace",
+          data_dir, -- Use the new, unique data directory
         },
-        root_dir = require("jdtls.setup").find_root({ ".git", "mvnw", "gradlew", "pom.xml" }),
+        root_dir = root_dir,
         settings = {
           java = {
             configuration = {
@@ -44,11 +56,6 @@ return {
                   name = "JavaSE-11",
                   path = "/Users/vasilegorcinschi/.sdkman/candidates/java/11.0.20.1-tem",
                 },
-              },
-            },
-            project = {
-              referencedLibraries = {
-                "lib/**/*.jar",
               },
             },
           },
