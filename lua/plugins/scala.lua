@@ -2,41 +2,10 @@ local map = vim.keymap.set
 local fn = vim.fn
 
 return {
+  -- Keep cmp-nvim-lsp for metals compatibility (works with both nvim-cmp and blink via blink.compat)
   {
     "hrsh7th/cmp-nvim-lsp",
-    lazy = false, -- Force loading during startup to ensure it's available
-  },
-  {
-    "hrsh7th/nvim-cmp",
-    event = "InsertEnter",
-    dependencies = {
-      { "hrsh7th/cmp-nvim-lsp" },
-      { "hrsh7th/cmp-vsnip" },
-      { "hrsh7th/vim-vsnip" },
-    },
-    opts = function()
-      local cmp = require("cmp")
-      local conf = {
-        sources = {
-          { name = "nvim_lsp" },
-          { name = "vsnip" },
-        },
-        snippet = {
-          expand = function(args)
-            -- Comes from vsnip
-            fn["vsnip#anonymous"](args.body)
-          end,
-        },
-        mapping = cmp.mapping.preset.insert({
-          -- None of this made sense to me when first looking into this since there
-          -- is no vim docs, but you can't have select = true here _unless_ you are
-          -- also using the snippet stuff. So keep in mind that if you remove
-          -- snippets you need to remove this select
-          ["<CR>"] = cmp.mapping.confirm({ select = true }),
-        }),
-      }
-      return conf
-    end,
+    lazy = false,
   },
   {
     "scalameta/nvim-metals",
@@ -97,14 +66,21 @@ return {
       -- any messages from metals. There is more info in the help docs about this
       metals_config.init_options.statusBarProvider = "off"
 
-      -- Example if you are using cmp how to make sure the correct capabilities for snippets are set
-      -- metals_config.capabilities = require("cmp_nvim_lsp").default_capabilities()
-      -- Option 2: Warn but continue
-      local has_cmp, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
-      if has_cmp then
+      -- Setup capabilities for either blink.cmp or nvim-cmp
+      -- Try blink first (if enabled), then fall back to nvim-cmp
+      local has_blink, blink = pcall(require, "blink.cmp")
+      local has_cmp_lsp, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
+      
+      if has_blink then
+        -- Using blink.cmp - get capabilities from cmp_nvim_lsp for metals
+        if has_cmp_lsp then
+          metals_config.capabilities = cmp_nvim_lsp.default_capabilities()
+        end
+      elseif has_cmp_lsp then
+        -- Using nvim-cmp
         metals_config.capabilities = cmp_nvim_lsp.default_capabilities()
       else
-        vim.notify("cmp_nvim_lsp not found - advanced completions won't be available", vim.log.levels.WARN)
+        vim.notify("No completion plugin found - advanced completions won't be available", vim.log.levels.WARN)
       end
       metals_config.on_attach = function(client, bufnr)
         require("metals").setup_dap()
