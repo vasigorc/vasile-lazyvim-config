@@ -79,7 +79,7 @@ return {
     dependencies = "nvim-lua/plenary.nvim",
     config = function()
       require("maven").setup({
-        executable = "mvn",
+        executable = vim.fn.expand("~/.sdkman/candidates/maven/current/bin/mvn"),
       })
     end,
   },
