@@ -15,33 +15,6 @@ return {
         "j-hui/fidget.nvim",
         opts = {},
       },
-      {
-        "mfussenegger/nvim-dap",
-        config = function(self, opts)
-          -- Debug settings if you're using nvim-dap
-          local dap = require("dap")
-
-          dap.configurations.scala = {
-            {
-              type = "scala",
-              request = "launch",
-              name = "RunOrTest",
-              metals = {
-                runType = "runOrTestFile",
-                --args = { "firstArg", "secondArg", "thirdArg" }, -- here just as an example
-              },
-            },
-            {
-              type = "scala",
-              request = "launch",
-              name = "Test Target",
-              metals = {
-                runType = "testTarget",
-              },
-            },
-          }
-        end,
-      },
     },
     ft = { "scala", "sbt" },
     opts = function()
@@ -70,7 +43,7 @@ return {
       -- Try blink first (if enabled), then fall back to nvim-cmp
       local has_blink, blink = pcall(require, "blink.cmp")
       local has_cmp_lsp, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
-      
+
       if has_blink then
         -- Using blink.cmp - get capabilities from cmp_nvim_lsp for metals
         if has_cmp_lsp then

@@ -7,12 +7,9 @@ return {
         xml = { "xmllint" },
         -- need to install it first, on MacOS: brew install google-java-format
         java = { "google-java-format" },
+        kotlin = { "ktlint" },
+        nix = { "nixfmt" },
       },
-      -- formatters = {
-      --   ["google-java-format"] = {
-      --     args = { "--aosp", "-" },
-      --   },
-      -- },
     },
   },
 }
