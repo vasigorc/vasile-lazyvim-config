@@ -12,6 +12,7 @@ return {
           filetypes = { "c", "cpp", "objc", "objcpp" },
         },
       },
+      nil_ls = {},
     },
   },
 
