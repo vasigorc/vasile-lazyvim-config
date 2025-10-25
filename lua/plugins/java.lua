@@ -20,7 +20,7 @@ return {
 
       local config = {
         cmd = {
-          "/Users/vasilegorcinschi/.sdkman/candidates/java/21.0.7-tem/bin/java",
+          "~/.sdkman/candidates/java/current/bin/java", -- assuming NeoVim is able to expand tilde
           "-Declipse.application=org.eclipse.jdt.ls.core.id1",
           "-Dosgi.bundles.defaultStartLevel=4",
           "-Declipse.product=org.eclipse.jdt.ls.core.product",
@@ -46,15 +46,15 @@ return {
               runtimes = {
                 {
                   name = "JavaSE-21",
-                  path = "/Users/vasilegorcinschi/.sdkman/candidates/java/21.0.7-tem",
+                  path = "~/.sdkman/candidates/java/current/bin/java",
                 },
                 {
                   name = "JavaSE-17",
-                  path = "/Users/vasilegorcinschi/.sdkman/candidates/java/17.0.9-tem",
+                  path = "~/.sdkman/candidates/java/17.0.9-tem",
                 },
                 {
                   name = "JavaSE-11",
-                  path = "/Users/vasilegorcinschi/.sdkman/candidates/java/11.0.20.1-tem",
+                  path = "~/.sdkman/candidates/java/11.0.20.1-tem",
                 },
               },
             },
