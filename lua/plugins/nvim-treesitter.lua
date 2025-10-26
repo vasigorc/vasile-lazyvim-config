@@ -25,6 +25,13 @@ return {
       "yaml",
       "go",
       "hocon",
+      "go",
+      "ron",
+      "rust",
+      "go",
+      "gomod",
+      "gowork",
+      "gosum",
     },
   },
   dependencies = {
