@@ -13,6 +13,15 @@ return {
         return
       end
 
+      -- Detect OS
+      local os_config = "config_linux"
+      if vim.fn.has("mac") == 1 then
+        os_config = "config_mac"
+      end
+
+      -- Expand home directory
+      local home = vim.fn.expand("~")
+
       -- Use a unique name for the workspace directory based on the project root.
       -- This prevents conflicts between projects.
       local workspace_dir = vim.fn.fnamemodify(root_dir, ":p:h:t")
@@ -20,7 +29,7 @@ return {
 
       local config = {
         cmd = {
-          "~/.sdkman/candidates/java/current/bin/java", -- assuming NeoVim is able to expand tilde
+          home .. "/.sdkman/candidates/java/current/bin/java",
           "-Declipse.application=org.eclipse.jdt.ls.core.id1",
           "-Dosgi.bundles.defaultStartLevel=4",
           "-Declipse.product=org.eclipse.jdt.ls.core.product",
@@ -33,11 +42,11 @@ return {
           "--add-opens",
           "java.base/java.lang=ALL-UNNAMED",
           "-jar",
-          vim.fn.glob("~/.local/share/nvim/mason/packages/jdtls/plugins/org.eclipse.equinox.launcher_*.jar"),
+          vim.fn.glob(home .. "/.local/share/nvim/mason/packages/jdtls/plugins/org.eclipse.equinox.launcher_*.jar"),
           "-configuration",
-          vim.fn.glob("~/.local/share/nvim/mason/packages/jdtls/config_mac"),
+          home .. "/.local/share/nvim/mason/packages/jdtls/" .. os_config,
           "-data",
-          data_dir, -- Use the new, unique data directory
+          data_dir,
         },
         root_dir = root_dir,
         settings = {
@@ -46,15 +55,15 @@ return {
               runtimes = {
                 {
                   name = "JavaSE-21",
-                  path = "~/.sdkman/candidates/java/current/bin/java",
+                  path = home .. "/.sdkman/candidates/java/current",
                 },
                 {
                   name = "JavaSE-17",
-                  path = "~/.sdkman/candidates/java/17.0.9-tem",
+                  path = home .. "/.sdkman/candidates/java/17.0.17-tem",
                 },
                 {
                   name = "JavaSE-11",
-                  path = "~/.sdkman/candidates/java/11.0.20.1-tem",
+                  path = home .. "/.sdkman/candidates/java/11.0.20.1-tem",
                 },
               },
             },
