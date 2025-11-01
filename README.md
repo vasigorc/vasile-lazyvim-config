@@ -13,7 +13,7 @@ of both
 Please see installation requirements for LazyVim [here](http://www.lazyvim.org/#%EF%B8%8F-requirements).
 For installation of Neovim (>= version 0.9.0) refer to their [installation guide](https://github.com/neovim/neovim/blob/master/INSTALL.md)
 
-#### Additional recommendations / recommendations:
+#### Additional recommendations / recommendations
 
 The link above mentions `lazygit` as an optional requirement. Since it makes working
 with Git in Neovim so much easier and joyful, I'd recommend to install be it manually
@@ -23,6 +23,11 @@ or as a Nix package (as part of your Nix set-up).
   manually install `metals` when on a `*.scala` file with `:MetalsInstall`
 - [Optional: for Protocol-Buffers] install [protols](https://github.com/coder3101/protols?tab=readme-ov-file#for-neovim) plugin.
   Make sure that you have `cargo` version `1.88.0` installed. This plugin requires `edition2024`. I used `rustup`'s `nightly toolchain'.
+- [Optional: for Go] Install Go CI linter to avoid anoying warnings:
+
+```bash
+go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+```
 
 ### Running inside `nix-shell`
 
@@ -56,19 +61,23 @@ To use CodeCompanion with Ollama, you need to install Ollama and download the `q
 
 **For Linux (Debian-based):**
 
-1.  **Install Ollama:**
+1. **Install Ollama:**
+
     ```bash
     curl -fsSL https://ollama.com/install.sh | sh
     ```
-2.  **Download the qwen3 model:**
+
+2. **Download the qwen3 model:**
+
     ```bash
     ollama pull qwen3:14b
     ```
 
 **For macOS:**
 
-1.  **Install Ollama:** Download the macOS application from [ollama.com/download](https://ollama.com/download) and follow the installation instructions.
-2.  **Download the qwen3 model:**
+1. **Install Ollama:** Download the macOS application from [ollama.com/download](https://ollama.com/download) and follow the installation instructions.
+2. **Download the qwen3 model:**
+
     ```bash
     ollama pull qwen3:14b
     ```

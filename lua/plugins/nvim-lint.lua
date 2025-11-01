@@ -6,6 +6,7 @@ return {
     linters_by_ft = {
       kotlin = { "ktlint" },
       nix = { "statix" },
+      go = { "golangcilint" },
     },
   },
 }
