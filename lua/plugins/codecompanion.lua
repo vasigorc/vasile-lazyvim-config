@@ -13,7 +13,7 @@ return {
             name = "ollama_qwen",
             schema = {
               model = {
-                default = "qwen3:14b",
+                default = "qwen2.5-coder:14b-instruct-q8_0",
               },
             },
           })
@@ -41,8 +41,8 @@ return {
         end,
       },
       strategies = {
-        chat = { adapter = "ollama_qwen" },
-        inline = { adapter = "ollama_qwen" },
+        chat = { adapter = "deepseek" },
+        inline = { adapter = "deepseek" },
         agent = { adapter = "deepseek" },
       },
       display = {
