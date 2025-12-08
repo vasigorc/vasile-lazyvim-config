@@ -24,7 +24,7 @@ return {
 
       -- Use a unique name for the workspace directory based on the project root.
       -- This prevents conflicts between projects.
-      local workspace_dir = vim.fn.fnamemodify(root_dir, ":p:h:t")
+      local workspace_dir = vim.fn.fnamemodify(root_dir, ":t")
       local data_dir = vim.fn.stdpath("data") .. "/jdtls-workspace/" .. workspace_dir
 
       local config = {
@@ -63,7 +63,7 @@ return {
                 },
                 {
                   name = "JavaSE-11",
-                  path = home .. "/.sdkman/candidates/java/11.0.20.1-tem",
+                  path = home .. "/.sdkman/candidates/java/11.0.29-tem",
                 },
               },
             },
