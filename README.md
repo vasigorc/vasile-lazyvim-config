@@ -101,10 +101,10 @@ To change the default model for Ollama, locate the `ollama_qwen` adapter definit
         end,
 ```
 
-To switch to a different adapter (e.g., OpenAI), you would modify the `strategies` section:
+To switch to a different adapter (e.g., OpenAI), you would modify the `interactions` section:
 
 ```lua
-      strategies = {
+      interactions = {
         chat = { adapter = "openai" }, -- Change 'ollama_qwen' to 'openai' or another configured adapter
         inline = { adapter = "openai" },
         agent = { adapter = "deepseek" },
