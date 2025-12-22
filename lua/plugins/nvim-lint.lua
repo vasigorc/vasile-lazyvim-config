@@ -5,7 +5,7 @@ return {
   opts = {
     linters_by_ft = {
       kotlin = { "ktlint" },
-      nix = { "statix" },
+      -- nix statix linter is already configured by LazyVim extras.lang.nix
       go = { "golangcilint" },
     },
   },
