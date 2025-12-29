@@ -25,7 +25,6 @@ return {
         "eslint-lsp",
         "prettier",
         "protols",
-        "sql-formatter",
       })
     end,
   },

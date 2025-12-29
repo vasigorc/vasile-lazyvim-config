@@ -8,7 +8,13 @@ return {
       },
       formatters = {
         sqlfluff = {
-          args = { "format", "--dialect=postgres", "-" },
+          command = "sqlfluff",
+          args = function(self, ctx)
+            return { "format", "--dialect=postgres", "--nocolor", ctx.filename }
+          end,
+          stdin = false,
+          cwd = require("conform.util").root_file({ ".git", ".sqlfluff" }),
+          require_cwd = false,
         },
       },
     },
@@ -40,15 +46,17 @@ return {
     end,
   },
 
-  -- Optional: Add sqls LSP for better SQL intelligence
+  -- Configure sqls LSP with formatting disabled
   {
     "neovim/nvim-lspconfig",
     opts = {
       servers = {
         sqls = {
-          -- Uncomment and configure if you install sqls
-          cmd = { "sqls" },
-          filetypes = { "sql", "mysql" },
+          -- Disable formatting - we use sqlfluff instead
+          on_attach = function(client, bufnr)
+            client.server_capabilities.documentFormattingProvider = false
+            client.server_capabilities.documentRangeFormattingProvider = false
+          end,
         },
       },
     },
