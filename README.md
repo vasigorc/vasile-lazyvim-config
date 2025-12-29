@@ -29,6 +29,19 @@ or as a Nix package (as part of your Nix set-up).
 go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 ```
 
+- [Optional: for SQL] Install SQL tooling for PostgreSQL-aware formatting and database connections:
+
+```bash
+# PostgreSQL-aware SQL formatter and linter
+pipx install sqlfluff
+
+# PostgreSQL client for database connections
+sudo apt install postgresql-client
+
+# Optional: SQL LSP server for enhanced intelligence
+go install github.com/sqls-server/sqls@latest
+```
+
 ### Running inside `nix-shell`
 
 [Nix](https://nix.dev/index.html) is a package management tool for reproducible development environments.
