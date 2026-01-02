@@ -37,6 +37,7 @@ require("lazy").setup({
     { import = "lazyvim.plugins.extras.lang.yaml" },
     { import = "lazyvim.plugins.extras.lang.zig" },
     { import = "lazyvim.plugins.extras.lang.java" },
+    { import = "lazyvim.plugins.extras.util.dot" },
     { import = "lazyvim.plugins.extras.formatting.biome" },
     { import = "lazyvim.plugins.extras.formatting.prettier" },
     -- import/override with your plugins
