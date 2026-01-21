@@ -42,6 +42,26 @@ sudo apt install postgresql-client
 go install github.com/sqls-server/sqls@latest
 ```
 
+- [Optional: for Ruby] Install Ruby via rbenv and required gems:
+
+```bash
+# Install rbenv and ruby-build (don't use apt install rbenv - it's outdated)
+git clone https://github.com/rbenv/rbenv.git ~/.rbenv
+git clone https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build
+
+# Add to ~/.zshrc (or ~/.bashrc)
+echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.zshrc
+echo 'eval "$(rbenv init - zsh)"' >> ~/.zshrc
+source ~/.zshrc
+
+# Install Ruby (check latest 3.4.x version with: rbenv install -l | grep ^3.4)
+rbenv install 3.4.8
+rbenv global 3.4.8
+
+# Install gems required by ruby_lsp and rubocop formatter
+gem install ruby-lsp rubocop
+```
+
 ### Running inside `nix-shell`
 
 [Nix](https://nix.dev/index.html) is a package management tool for reproducible development environments.
