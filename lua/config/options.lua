@@ -20,4 +20,8 @@ vim.opt.relativenumber = false -- Disable relative line numbers
 vim.g.lazyvim_prettier_needs_config = false
 -- LSP server to use for Rust
 vim.g.lazyvim_rust_diagnostics = "rust-analyzer"
+
+-- LSP Server to use for Ruby (options: "ruby_lsp" or "solargraph")
+vim.g.lazyvim_ruby_lsp = "ruby_lsp"
+vim.g.lazyvim_ruby_formatter = "rubocop"
 vim.opt_global.completeopt = { "menuone", "noinsert", "noselect" }
