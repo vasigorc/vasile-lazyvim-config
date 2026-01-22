@@ -58,8 +58,8 @@ source ~/.zshrc
 rbenv install 3.4.8
 rbenv global 3.4.8
 
-# Install gems required by ruby_lsp and rubocop formatter
-gem install ruby-lsp rubocop
+# Install required gems
+gem install rubocop sonargraph
 ```
 
 ### Running inside `nix-shell`
@@ -96,24 +96,24 @@ To use CodeCompanion with Ollama, you need to install Ollama and download the `q
 
 1. **Install Ollama:**
 
-    ```bash
-    curl -fsSL https://ollama.com/install.sh | sh
-    ```
+   ```bash
+   curl -fsSL https://ollama.com/install.sh | sh
+   ```
 
 2. **Download the qwen3 model:**
 
-    ```bash
-    ollama pull qwen3:14b
-    ```
+   ```bash
+   ollama pull qwen3:14b
+   ```
 
 **For macOS:**
 
 1. **Install Ollama:** Download the macOS application from [ollama.com/download](https://ollama.com/download) and follow the installation instructions.
 2. **Download the qwen3 model:**
 
-    ```bash
-    ollama pull qwen3:14b
-    ```
+   ```bash
+   ollama pull qwen3:14b
+   ```
 
 ### Switching to Other Models
 
