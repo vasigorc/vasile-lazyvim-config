@@ -15,10 +15,14 @@ For installation of Neovim (>= version 0.9.0) refer to their [installation guide
 
 #### Additional recommendations / recommendations
 
-The link above mentions `lazygit` as an optional requirement. Since it makes working
-with Git in Neovim so much easier and joyful, I'd recommend to install be it manually
-or as a Nix package (as part of your Nix set-up).
-
+- [nvim](https://github.com/neovim/neovim/blob/master/INSTALL.md) 
+- [lazygit](https://github.com/jesseduffield/lazygit?tab=readme-ov-file#installation)
+- [rustup](https://rust-lang.org/tools/install/)
+  - [Optional for Rust] Run `rustup component add rust-analyzer`
+- [go](https://go.dev/doc/install)
+- [pipx](https://github.com/pypa/pipx?tab=readme-ov-file#install-pipx)
+- [fd](https://github.com/sharkdp/fd?tab=readme-ov-file#installation)
+- [Optional: if you want to avoid errors having images in Markdown files] [imagemagick](https://imagemagick.org/script/download.php#gsc.tab=0)
 - [Optional: for Scala] NeoVm will configure `metals` for you, but you will have to
   manually install `metals` when on a `*.scala` file with `:MetalsInstall`
 - [Optional: for Protocol-Buffers] install [protols](https://github.com/coder3101/protols?tab=readme-ov-file#for-neovim) plugin.
