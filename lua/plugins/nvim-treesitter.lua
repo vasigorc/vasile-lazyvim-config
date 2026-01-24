@@ -27,6 +27,7 @@ return {
       "hocon",
       "go",
       "ron",
+      "ruby",
       "rust",
       "go",
       "gomod",
