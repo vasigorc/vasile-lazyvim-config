@@ -9,6 +9,9 @@ return {
         java = { "google-java-format" },
         kotlin = { "ktlint" },
         nix = { "nixfmt" },
+        -- Ruby/ERB formatting
+        ruby = { "rubocop" },
+        eruby = { "erb_format" },
       },
     },
   },

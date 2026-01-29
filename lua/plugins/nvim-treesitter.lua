@@ -46,7 +46,7 @@ return {
           callback = function(ev)
             -- Wait a bit for lazy loading, then set up keymaps
             vim.defer_fn(function()
-              vim.treesitter.start()
+              vim.treesitter.start(ev.buf)
               local ok, ts_move = pcall(require, "nvim-treesitter-textobjects.move")
               if not ok then
                 return

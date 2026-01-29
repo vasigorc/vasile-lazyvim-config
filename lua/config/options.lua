@@ -22,7 +22,7 @@ vim.g.lazyvim_prettier_needs_config = false
 vim.g.lazyvim_rust_diagnostics = "rust-analyzer"
 
 -- Set to "solargraph" to use solargraph instead of ruby_lsp.
--- Set to "ruby_lsp" to use ruby_lsp instead of ruby_lsp.
-vim.g.lazyvim_ruby_lsp = "solargraph"
+-- Set to "ruby_lsp" to use ruby_lsp instead of solargraph.
+vim.g.lazyvim_ruby_lsp = "ruby_lsp"
 vim.g.lazyvim_ruby_formatter = "rubocop"
 vim.opt_global.completeopt = { "menuone", "noinsert", "noselect" }
