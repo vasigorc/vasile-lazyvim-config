@@ -7,12 +7,14 @@ return {
         protols = {
           filetypes = { "proto" },
         },
-        -- Clangd configuration
         clangd = {
           filetypes = { "c", "cpp", "objc", "objcpp" },
         },
+        nil_ls = {},
+        ruby_lsp = {
+          mason = false,
+        },
       },
-      nil_ls = {},
     },
   },
 

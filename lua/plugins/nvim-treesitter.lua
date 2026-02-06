@@ -42,10 +42,14 @@ return {
         -- Wait for the plugin to actually load, then set up keymaps
         vim.api.nvim_create_autocmd("FileType", {
           group = vim.api.nvim_create_augroup("manual_textobjects", { clear = true }),
-          pattern = { "go", "rust", "python", "javascript", "typescript", "lua", "java", "scala" },
+          pattern = { "go", "rust", "python", "javascript", "typescript", "lua", "java", "scala", "ruby" },
           callback = function(ev)
             -- Wait a bit for lazy loading, then set up keymaps
             vim.defer_fn(function()
+              -- Check if buffer is still valid before starting treesitter
+              if not vim.api.nvim_buf_is_valid(ev.buf) then
+                return
+              end
               vim.treesitter.start(ev.buf)
               local ok, ts_move = pcall(require, "nvim-treesitter-textobjects.move")
               if not ok then
