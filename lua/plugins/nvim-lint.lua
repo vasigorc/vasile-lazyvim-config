@@ -8,5 +8,10 @@ return {
       -- nix statix linter is already configured by LazyVim extras.lang.nix
       go = { "golangcilint" },
     },
+    linters = {
+      golangcilint = {
+        mason = false,
+      },
+    },
   },
 }
