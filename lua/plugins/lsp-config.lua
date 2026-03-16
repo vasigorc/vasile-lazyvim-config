@@ -14,6 +14,9 @@ return {
         ruby_lsp = {
           mason = false,
         },
+        sorbet = {
+          mason = false,
+        },
       },
     },
   },
