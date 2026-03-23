@@ -2,7 +2,13 @@ return {
   {
     "nvim-telescope/telescope.nvim",
     opts = {
+      defaults = {
+        file_ignore_patterns = { "%.rbi$" },
+      },
       pickers = {
+        lsp_dynamic_workspace_symbols = {
+          file_ignore_patterns = { "%.rbi$" },
+        },
         find_files = {
           hidden = true,
           attach_mappings = function(_, map)

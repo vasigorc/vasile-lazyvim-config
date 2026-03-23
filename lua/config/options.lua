@@ -25,4 +25,4 @@ vim.g.lazyvim_rust_diagnostics = "rust-analyzer"
 -- Set to "ruby_lsp" to use ruby_lsp instead of solargraph.
 vim.g.lazyvim_ruby_lsp = "ruby_lsp"
 vim.g.lazyvim_ruby_formatter = "rubocop"
-vim.opt_global.completeopt = { "menuone", "noinsert", "noselect" }
+-- vim.opt_global.completeopt = { "menuone", "noinsert", "noselect" }
