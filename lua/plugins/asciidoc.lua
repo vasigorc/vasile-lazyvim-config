@@ -3,7 +3,7 @@ return {
   {
     "tigion/nvim-asciidoc-preview",
     ft = { "asciidoc" },
-    build = "cd server && npm install",
+    build = "cd server && pnpm install",
     config = function()
       require("asciidoc-preview").setup({
         server = {
