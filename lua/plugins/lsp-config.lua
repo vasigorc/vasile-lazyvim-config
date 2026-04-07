@@ -16,6 +16,14 @@ return {
         },
         sorbet = {
           mason = false,
+          handlers = {
+            ["textDocument/publishDiagnostics"] = function(err, result, ctx, config)
+              if result and result.uri and not result.uri:match("^%w+://") then
+                result.uri = "file://" .. vim.fn.getcwd() .. "/" .. result.uri
+              end
+              return vim.lsp.diagnostic.on_publish_diagnostics(err, result, ctx, config)
+            end,
+          },
         },
       },
     },
