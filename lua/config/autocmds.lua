@@ -35,3 +35,60 @@ autocmd({ "BufNewFile", "BufRead" }, {
   pattern = "*.conf",
   command = "set ft=hocon",
 })
+
+-- Restore :LspLog removed in Neovim 0.12
+vim.api.nvim_create_user_command("LspLog", function()
+  vim.cmd("edit " .. vim.lsp.get_log_path())
+end, { desc = "Open LSP log file" })
+
+-- Recover from stale RuboCop LSP server cache when GEM_HOME hash rotates (dev/nix-shell)
+local rubocop_cache_guard = vim.api.nvim_create_augroup("rubocop_cache_guard", { clear = true })
+
+local function ruby_project_root()
+  local gemfile = vim.fs.find("Gemfile", { upward = true, path = vim.fn.getcwd() })[1]
+  return gemfile and vim.fs.dirname(gemfile) or nil
+end
+
+local function rubocop_server_cache_dir(root)
+  local key = root:gsub("^/", ""):gsub("/", "+")
+  return string.format("%s/tmp/rubocop/rubocop_cache/server/%s", root, key)
+end
+
+local function clear_stale_rubocop_cache()
+  local root = ruby_project_root()
+  local gem_home = vim.env.GEM_HOME
+  if not root or not gem_home then
+    return
+  end
+
+  local server_dir = rubocop_server_cache_dir(root)
+  local stderr_file = server_dir .. "/stderr"
+  if vim.fn.filereadable(stderr_file) == 0 then
+    return
+  end
+
+  local line = (vim.fn.readfile(stderr_file, "", 1)[1] or "")
+  local stale_config = line:match("Configuration file not found:") and line:match("rubocop%-shopify")
+  if not stale_config or line:find(gem_home, 1, true) then
+    return
+  end
+
+  local pid_file = server_dir .. "/pid"
+  if vim.fn.filereadable(pid_file) == 1 then
+    local pid = (vim.fn.readfile(pid_file, "", 1)[1] or ""):match("^%s*(%d+)%s*$")
+    if pid then
+      local cmd = vim.fn.system({ "ps", "-p", pid, "-o", "command=" })
+      if cmd:match("rubocop %-%-lsp") and cmd:find(root, 1, true) then
+        vim.fn.system({ "kill", pid })
+      end
+    end
+  end
+
+  vim.fn.delete(server_dir, "rf")
+  vim.notify("Cleared stale RuboCop LSP cache for current project", vim.log.levels.INFO)
+end
+
+autocmd({ "VimEnter", "DirChanged" }, {
+  group = rubocop_cache_guard,
+  callback = clear_stale_rubocop_cache,
+})
