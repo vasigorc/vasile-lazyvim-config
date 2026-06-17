@@ -6,11 +6,18 @@ return {
       bigfile = { enabled = false },
       gitbrowse = {
         config = function(opts)
-          -- Keep the git remote as gitstream, but browse Shopify's monorepo on GitHub.
+          -- Keep environment-specific remote rewrites in shell env, not in Lua config.
+          local remote_from = os.getenv("NVIM_GITBROWSE_REMOTE_FROM")
+          local remote_to = os.getenv("NVIM_GITBROWSE_REMOTE_TO")
+
+          if remote_from == nil or remote_from == "" or remote_to == nil or remote_to == "" then
+            return
+          end
+
           opts.remote_patterns = opts.remote_patterns or {}
           table.insert(opts.remote_patterns, 1, {
-            "^https://gitstream%.shopify%.io/shop/world%.git$",
-            "https://github.com/shop/world.git",
+            "^" .. vim.pesc(remote_from) .. "$",
+            remote_to,
           })
         end,
       },

@@ -9,14 +9,14 @@ return {
     require("codecompanion").setup({
       adapters = {
         http = {
-          -- Shopify-proxified Claude (opus, sonnet, haiku)
-          shopify_claude = function()
+          -- Claude via optional proxy env vars, with personal direct-provider fallback.
+          claude_proxy = function()
             return require("codecompanion.adapters").extend("anthropic", {
-              name = "shopify_claude",
-              formatted_name = "Shopify Claude",
-              url = os.getenv("SHOPIFY_CLAUDE_URL") or "https://api.anthropic.com/v1/messages",
+              name = "claude_proxy",
+              formatted_name = "Claude Proxy",
+              url = os.getenv("CLAUDE_PROXY_URL") or "https://api.anthropic.com/v1/messages",
               env = {
-                api_key = "cmd:" .. (os.getenv("SHOPIFY_CLAUDE_API_KEY_CMD") or "echo $ANTHROPIC_API_KEY"),
+                api_key = "cmd:" .. (os.getenv("CLAUDE_PROXY_API_KEY_CMD") or "echo $ANTHROPIC_API_KEY"),
               },
               schema = {
                 model = {
@@ -73,8 +73,8 @@ return {
         },
       },
       interactions = {
-        chat = { adapter = "shopify_claude" },
-        inline = { adapter = "shopify_claude" },
+        chat = { adapter = "claude_proxy" },
+        inline = { adapter = "claude_proxy" },
       },
       display = {
         action_palette = {
