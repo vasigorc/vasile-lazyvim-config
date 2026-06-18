@@ -127,8 +127,25 @@ return {
                     },
                   },
                 },
-                temperature = { default = nil },
-                top_p = { default = nil },
+                -- GPT 5.x Responses models reject sampling overrides like top_p.
+                -- Mark them disabled for the picker/defaults, and the request
+                -- handler below strips stale values from existing chat buffers.
+                temperature = { enabled = function() return false end },
+                top_p = { enabled = function() return false end },
+              },
+              handlers = {
+                request = {
+                  build_parameters = function(self, params, messages)
+                    params = require("codecompanion.adapters.http.openai_responses").handlers.request.build_parameters(
+                      self,
+                      params,
+                      messages
+                    )
+                    params.temperature = nil
+                    params.top_p = nil
+                    return params
+                  end,
+                },
               },
             })
           end,
