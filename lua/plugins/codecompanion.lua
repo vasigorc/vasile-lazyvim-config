@@ -6,6 +6,34 @@ return {
     "ravitemer/codecompanion-history.nvim",
   },
   config = function()
+    local function openai_responses_url()
+      local url = os.getenv("OPENAI_RESPONSES_PROXY_URL")
+      if url and url ~= "" then
+        return url
+      end
+
+      url = os.getenv("OPENAI_COMPAT_PROXY_URL")
+      if url and url ~= "" then
+        url = url:gsub("/+$", "")
+        url = url:gsub("/chat/completions$", "/responses")
+        if not url:match("/responses$") then
+          url = url .. "/responses"
+        end
+        return url
+      end
+
+      local base = os.getenv("OPENAI_API_BASE")
+      if base and base ~= "" then
+        url = base:gsub("/+$", "")
+        if not url:match("/responses$") then
+          url = url .. "/responses"
+        end
+        return url
+      end
+
+      return "https://api.openai.com/v1/responses"
+    end
+
     require("codecompanion").setup({
       adapters = {
         http = {
@@ -20,8 +48,16 @@ return {
               },
               schema = {
                 model = {
-                  default = "claude-sonnet-4-6",
+                  default = "claude-opus-4-8",
                   choices = {
+                    ["claude-opus-4-8"] = {
+                      formatted_name = "Claude Opus 4.8",
+                      opts = { can_reason = true, has_vision = true },
+                    },
+                    ["claude-opus-4-7"] = {
+                      formatted_name = "Claude Opus 4.7",
+                      opts = { can_reason = true, has_vision = true },
+                    },
                     ["claude-opus-4-6"] = {
                       formatted_name = "Claude Opus 4.6",
                       opts = { can_reason = true, has_vision = true },
@@ -36,7 +72,7 @@ return {
                     },
                   },
                 },
-              },
+              }
             })
           end,
           ollama_qwen = function()
@@ -57,9 +93,42 @@ return {
             })
           end,
           openai = function()
-            return require("codecompanion.adapters").extend("openai", {
+            return require("codecompanion.adapters").extend("openai_responses", {
+              name = "openai",
+              formatted_name = "GPT Proxy (Responses)",
+              url = openai_responses_url(),
               env = {
-                api_key = os.getenv("OPENAI_API_KEY"),
+                api_key = "cmd:"
+                  .. (os.getenv("OPENAI_COMPAT_PROXY_API_KEY_CMD") or "echo $PERSONAL_OPENAI_API_KEY"),
+              },
+              schema = {
+                model = {
+                  default = "gpt-5.5",
+                  choices = {
+                    ["gpt-5.5"] = {
+                      formatted_name = "GPT 5.5",
+                      meta = { context_window = 1050000 },
+                      opts = { has_function_calling = true, has_vision = true, can_reason = true },
+                    },
+                    ["gpt-5.4"] = {
+                      formatted_name = "GPT 5.4",
+                      meta = { context_window = 1050000 },
+                      opts = { has_function_calling = true, has_vision = true, can_reason = true },
+                    },
+                    ["gpt-5.4-mini"] = {
+                      formatted_name = "GPT 5.4 Mini",
+                      meta = { context_window = 400000 },
+                      opts = { has_function_calling = true, has_vision = true, can_reason = true },
+                    },
+                    ["gpt-5.3-codex"] = {
+                      formatted_name = "GPT 5.3 Codex",
+                      meta = { context_window = 400000 },
+                      opts = { has_function_calling = true, has_vision = true, can_reason = true },
+                    },
+                  },
+                },
+                temperature = { default = nil },
+                top_p = { default = nil },
               },
             })
           end,
@@ -70,6 +139,11 @@ return {
               },
             })
           end,
+          opts = {
+            -- Avoid accidentally selecting built-in direct-provider adapters that may
+            -- send workspace-issued tokens to public provider endpoints.
+            show_presets = false,
+          },
         },
       },
       interactions = {
@@ -98,6 +172,10 @@ return {
           opts = {
             keymap = "gh",
             auto_generate_title = true,
+            title_generation_opts = {
+              adapter = "claude_proxy",
+              model = "claude-haiku-4-5-20251001",
+            },
             continue_last_chat = false,
             delete_on_clearing_chat = false,
             picker = "telescope",
