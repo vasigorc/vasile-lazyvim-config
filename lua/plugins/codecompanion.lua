@@ -72,7 +72,44 @@ return {
                     },
                   },
                 },
-              }
+              },
+              handlers = {
+                -- Claude Opus 4.7/4.8 reject the legacy extended-thinking shape
+                -- (`thinking = { type = "enabled", budget_tokens = N }`). The proxy
+                -- requires the newer adaptive thinking API: `thinking.type = "adaptive"`
+                -- plus `output_config.effort`.
+                --
+                -- The base adapter decides whether to attach thinking from the
+                -- adapter's *default* model (Opus 4.8, can_reason), not the actual
+                -- per-request model. That means non-reasoning requests (e.g. Haiku
+                -- title generation) wrongly get thinking params and the proxy errors.
+                -- So: gate on the resolved request model. Strip thinking entirely for
+                -- non-reasoning models; rewrite to the adaptive shape otherwise.
+                form_parameters = function(self, params, messages)
+                  params = require("codecompanion.adapters.http.anthropic").handlers.form_parameters(
+                    self,
+                    params,
+                    messages
+                  )
+                  if type(params.thinking) == "table" then
+                    local choices = self.schema.model.choices
+                    local choice = params.model and choices and choices[params.model]
+                    local can_reason = choice and choice.opts and choice.opts.can_reason
+                    if can_reason then
+                      params.thinking = { type = "adaptive" }
+                      params.output_config = vim.tbl_extend(
+                        "force",
+                        params.output_config or {},
+                        { effort = "high" }
+                      )
+                    else
+                      params.thinking = nil
+                      params.temperature = nil
+                    end
+                  end
+                  return params
+                end,
+              },
             })
           end,
           ollama_qwen = function()
