@@ -83,7 +83,7 @@ return {
                     },
                     ["claude-haiku-4-5-20251001"] = {
                       formatted_name = "Claude Haiku 4.5",
-                      opts = { has_vision = true },
+                      opts = { has_vision = true, max_tokens = 64000 },
                     },
                   },
                 },
@@ -106,11 +106,23 @@ return {
                     params,
                     messages
                   )
+                  local choices = self.schema.model.choices
+                  local choice = params.model and choices and choices[params.model]
+                  local model_opts = choice and choice.opts
+
+                  -- Clamp max_tokens to the resolved model's output cap. The base
+                  -- adapter sizes max_tokens from the adapter's *default* model
+                  -- (Opus 4.8 -> 128000), so a per-request override to a smaller
+                  -- model (e.g. Haiku title generation, cap 64000) would send
+                  -- max_tokens > cap and the proxy returns HTTP 400.
+                  if model_opts and model_opts.max_tokens
+                    and type(params.max_tokens) == "number"
+                    and params.max_tokens > model_opts.max_tokens then
+                    params.max_tokens = model_opts.max_tokens
+                  end
+
                   if type(params.thinking) == "table" then
-                    local choices = self.schema.model.choices
-                    local choice = params.model and choices and choices[params.model]
-                    local can_reason = choice and choice.opts and choice.opts.can_reason
-                    if can_reason then
+                    if model_opts and model_opts.can_reason then
                       params.thinking = { type = "adaptive" }
                       params.output_config = vim.tbl_extend(
                         "force",
