@@ -136,6 +136,36 @@ return {
                   end
                   return params
                 end,
+                -- Anthropic context compaction (`context_management` with the
+                -- `compact_20260112` strategy) is attached by the base adapter's
+                -- `setup`, which gates on `schema.model.default` (Opus 4.8, has
+                -- can_manage_context) rather than the *resolved* request model.
+                -- Title generation runs on Haiku (model in `parameters.model`,
+                -- default stays Opus), so compaction is wrongly attached and Haiku
+                -- returns 400 ("does not support the 'compact_20260112' context
+                -- management strategy"). Strip it for models that can't compact,
+                -- keyed on the resolved request model.
+                form_messages = function(self, messages)
+                  local result = require("codecompanion.adapters.http.anthropic").handlers.form_messages(
+                    self,
+                    messages
+                  )
+                  local model = (self.parameters and self.parameters.model) or self.schema.model.default
+                  local choices = self.schema.model.choices
+                  local choice = model and choices and choices[model]
+                  local can_manage = choice and choice.opts and choice.opts.can_manage_context
+                  if not can_manage then
+                    result.context_management = nil
+                    pcall(function()
+                      require("codecompanion.utils.adapters").remove_header(
+                        self.headers,
+                        "anthropic-beta",
+                        "compact-2026-01-12"
+                      )
+                    end)
+                  end
+                  return result
+                end,
               },
             })
           end,
