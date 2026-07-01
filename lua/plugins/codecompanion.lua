@@ -6,6 +6,21 @@ return {
     "ravitemer/codecompanion-history.nvim",
   },
   config = function()
+    -- CodeCompanion loads its builtin prompt library (/fix, /explain, /lsp,
+    -- /tests, ...) from markdown whose YAML frontmatter is parsed via the `yaml`
+    -- treesitter parser. That parser is a documented prerequisite (see
+    -- codecompanion's doc/installation.md). Without it, every builtin prompt is
+    -- rejected with "[Prompt Library] Missing frontmatter, name or interaction"
+    -- and aliases such as /fix report "Could not find `fix` in the prompt library".
+    -- `yaml` is declared in nvim-treesitter's ensure_installed, but on the `main`
+    -- branch a one-time parser install can be skipped, so ensure it here.
+    if not pcall(vim.treesitter.get_string_parser, "a: b", "yaml") then
+      local ok_ts, ts = pcall(require, "nvim-treesitter")
+      if ok_ts and type(ts.install) == "function" then
+        ts.install({ "yaml" }) -- async on main branch; ready on next launch
+      end
+    end
+
     local function openai_responses_url()
       local url = os.getenv("OPENAI_RESPONSES_PROXY_URL")
       if url and url ~= "" then
