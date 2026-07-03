@@ -264,7 +264,7 @@ return {
           -- (including /fix, /explain and manual :CodeCompanion sessions) so the
           -- assistant can edit files and run code on our behalf instead of only
           -- describing the change. Equivalent to typing @agent in each chat.
-          tools = { default_tools = { "agent" } },
+          tools = { opts = { default_tools = { "agent" } } },
         },
         inline = { adapter = "claude_proxy" },
       },
