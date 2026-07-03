@@ -258,7 +258,14 @@ return {
         },
       },
       interactions = {
-        chat = { adapter = "claude_proxy" },
+        chat = {
+          adapter = "claude_proxy",
+          -- Auto-load the built-in "agent" tool group in every chat buffer
+          -- (including /fix, /explain and manual :CodeCompanion sessions) so the
+          -- assistant can edit files and run code on our behalf instead of only
+          -- describing the change. Equivalent to typing @agent in each chat.
+          tools = { default_tools = { "agent" } },
+        },
         inline = { adapter = "claude_proxy" },
       },
       display = {
