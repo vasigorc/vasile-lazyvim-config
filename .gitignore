@@ -1,2 +1,4 @@
 *.json
 !data/github-emoji-shortcodes.json
+
+.env

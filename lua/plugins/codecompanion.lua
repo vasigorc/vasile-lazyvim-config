@@ -49,6 +49,23 @@ return {
       return "https://api.openai.com/v1/responses"
     end
 
+    -- Default adapter/model for chat + inline, chosen per-machine via the
+    -- gitignored `.env` (see `.env.sample`). Unset falls back to claude_proxy.
+    local default_adapter
+    do
+      local name = os.getenv("CC_DEFAULT_ADAPTER")
+      name = (name and name ~= "") and name or "claude_proxy"
+      local model = os.getenv("CC_DEFAULT_MODEL")
+      default_adapter = (model and model ~= "") and { name = name, model = model } or name
+    end
+
+    -- History title generation runs a separate cheap request; also env-driven so
+    -- it doesn't hit a provider with no balance. Defaults to claude_proxy/haiku.
+    local title_adapter = os.getenv("CC_TITLE_ADAPTER")
+    title_adapter = (title_adapter and title_adapter ~= "") and title_adapter or "claude_proxy"
+    local title_model = os.getenv("CC_TITLE_MODEL")
+    title_model = (title_model and title_model ~= "") and title_model or "claude-haiku-4-5-20251001"
+
     require("codecompanion").setup({
       adapters = {
         http = {
@@ -259,14 +276,14 @@ return {
       },
       interactions = {
         chat = {
-          adapter = "claude_proxy",
+          adapter = default_adapter,
           -- Auto-load the built-in "agent" tool group in every chat buffer
           -- (including /fix, /explain and manual :CodeCompanion sessions) so the
           -- assistant can edit files and run code on our behalf instead of only
           -- describing the change. Equivalent to typing @agent in each chat.
           tools = { opts = { default_tools = { "agent" } } },
         },
-        inline = { adapter = "claude_proxy" },
+        inline = { adapter = default_adapter },
       },
       display = {
         action_palette = {
@@ -291,8 +308,8 @@ return {
             keymap = "gh",
             auto_generate_title = true,
             title_generation_opts = {
-              adapter = "claude_proxy",
-              model = "claude-haiku-4-5-20251001",
+              adapter = title_adapter,
+              model = title_model,
             },
             continue_last_chat = false,
             delete_on_clearing_chat = false,
