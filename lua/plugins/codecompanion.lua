@@ -66,6 +66,40 @@ return {
     local title_model = os.getenv("CC_TITLE_MODEL")
     title_model = (title_model and title_model ~= "") and title_model or "claude-haiku-4-5-20251001"
 
+    -- ACP adapters (e.g. `claude_code`) are agent subprocesses, not HTTP endpoints:
+    -- CodeCompanion spawns `claude-agent-acp`, which drives the Claude Code CLI, so
+    -- Opus/Sonnet bill against the Claude subscription rather than API credits.
+    -- Opt in from `.env` with CC_DEFAULT_ADAPTER=claude_code (+ CC_DEFAULT_MODEL=opus).
+    -- They only drive CHAT. The inline interaction bails on `adapter.type ~= "http"`
+    -- and title generation is a plain HTTP request, so both must keep an HTTP adapter
+    -- or selecting an ACP chat adapter would break them.
+    local function is_acp(name)
+      if not name or name == "opts" or name == "extend" then
+        return false
+      end
+      local ok, cc = pcall(require, "codecompanion.config")
+      local acp = ok and cc and cc.adapters and cc.adapters.acp
+      return (acp and acp[name]) ~= nil
+    end
+
+    -- Inline keeps whatever chat uses while that is HTTP (previous behaviour), and
+    -- falls back to an HTTP adapter otherwise. CC_INLINE_ADAPTER overrides outright.
+    local inline_adapter = default_adapter
+    do
+      local name = os.getenv("CC_INLINE_ADAPTER")
+      local model = os.getenv("CC_INLINE_MODEL")
+      if name and name ~= "" then
+        inline_adapter = (model and model ~= "") and { name = name, model = model } or name
+      elseif is_acp(type(default_adapter) == "table" and default_adapter.name or default_adapter) then
+        inline_adapter = "claude_proxy"
+      end
+    end
+
+    if is_acp(title_adapter) then
+      title_adapter = "claude_proxy"
+      title_model = "claude-haiku-4-5-20251001"
+    end
+
     require("codecompanion").setup({
       adapters = {
         http = {
@@ -273,6 +307,40 @@ return {
             show_presets = false,
           },
         },
+        acp = {
+          -- Claude Code over ACP. Rather than calling an HTTP endpoint, CodeCompanion
+          -- spawns the `claude-agent-acp` bridge, which drives the Claude Code CLI --
+          -- so Opus/Sonnet run against a Claude Pro/Max *subscription* instead of
+          -- consuming API credits. Entirely optional: this is only ever used when
+          -- `.env` sets CC_DEFAULT_ADAPTER=claude_code, so the HTTP/proxy adapters
+          -- above remain the default and are unaffected.
+          --
+          -- Requires the bridge on PATH:
+          --   npm i -g @agentclientprotocol/claude-agent-acp
+          -- It is a node script (`#!/usr/bin/env node`), so node must also be on the
+          -- PATH that Neovim inherits. If it is not, set CC_CLAUDE_ACP_CMD to an
+          -- absolute path (or a wrapper script that loads node) instead.
+          claude_code = function()
+            local cmd = os.getenv("CC_CLAUDE_ACP_CMD")
+            cmd = (cmd and cmd ~= "") and cmd or "claude-agent-acp"
+
+            -- Claude Code treats ANTHROPIC_API_KEY as taking precedence over the
+            -- claude.ai login ("claude.ai connectors are disabled because
+            -- ANTHROPIC_API_KEY ... takes precedence over your claude.ai login").
+            -- Neovim inherits that key from the shell, so the bridge would bill
+            -- pay-as-you-go API credits instead of the subscription -- exactly what
+            -- this adapter exists to avoid, and it fails outright ("Credit balance
+            -- is too low") when the API account is empty. Strip the key from the
+            -- bridge's environment only; the HTTP adapters above still receive it.
+            local strip = { "env", "-u", "ANTHROPIC_API_KEY", "-u", "ANTHROPIC_AUTH_TOKEN" }
+            return require("codecompanion.adapters").extend("claude_code", {
+              commands = {
+                default = vim.list_extend(vim.deepcopy(strip), { cmd }),
+                yolo = vim.list_extend(vim.deepcopy(strip), { cmd, "--yolo" }),
+              },
+            })
+          end,
+        },
       },
       interactions = {
         chat = {
@@ -283,7 +351,7 @@ return {
           -- describing the change. Equivalent to typing @agent in each chat.
           tools = { opts = { default_tools = { "agent" } } },
         },
-        inline = { adapter = default_adapter },
+        inline = { adapter = inline_adapter },
       },
       display = {
         action_palette = {

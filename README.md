@@ -119,33 +119,39 @@ To use CodeCompanion with Ollama, you need to install Ollama and download the `q
    ollama pull qwen3:14b
    ```
 
-### Switching to Other Models
+### Selecting the adapter and model (`.env`)
 
-The default model for CodeCompanion is `qwen3:14b` due to its cost-effectiveness. However, you can easily switch to other models supported by Ollama or other adapters (e.g., OpenAI, DeepSeek, Anthropic) by modifying the `lua/plugins/codecompanion.lua` file.
+Which adapter and model CodeCompanion uses is a **per-machine** choice, so it is kept out of version control. Copy the tracked template and edit your copy:
 
-To change the default model for Ollama, locate the `ollama_qwen` adapter definition and modify the `model` field:
-
-```lua
-        ollama_qwen = function()
-          return require("codecompanion.adapters").extend("ollama", {
-            name = "ollama_qwen",
-            schema = {
-              model = {
-                default = "qwen3:14b", -- Change 'qwen3:14b' to your desired Ollama model
-              },
-            },
-          })
-        end,
+```bash
+cp .env.sample .env
 ```
 
-To switch to a different adapter (e.g., OpenAI), you would modify the `interactions` section:
+`.env` is gitignored and loaded at startup by `lua/config/env.lua`. It is a plain `KEY=VALUE` file; anything already exported by your shell takes precedence over it. The main knobs (all optional — see `.env.sample` for the full list):
 
-```lua
-      interactions = {
-        chat = { adapter = "openai" }, -- Change 'ollama_qwen' to 'openai' or another configured adapter
-        inline = { adapter = "openai" },
-        agent = { adapter = "deepseek" },
-      },
+| Variable | Purpose |
+| --- | --- |
+| `CC_DEFAULT_ADAPTER` | Adapter for chat + inline (e.g. `deepseek`, `openai`, `ollama_qwen`, `claude_code`) |
+| `CC_DEFAULT_MODEL` | Model within that adapter |
+| `CC_TITLE_ADAPTER` / `CC_TITLE_MODEL` | Adapter/model for chat-history title generation |
+
+Leaving them unset keeps the defaults defined in `lua/plugins/codecompanion.lua`. Adapters that talk to a paid API still need their key exported (e.g. `DEEPSEEK_API_KEY`, `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`) — keep those in your shell (e.g. `~/.zshrc`), not in the repo.
+
+### Optional: Claude Code via ACP
+
+CodeCompanion can also talk to Claude models through the [Agent Client Protocol](https://agentclientprotocol.com/), driving the Claude Code CLI as a subprocess instead of calling an HTTP endpoint. The appeal: it runs against a **Claude Pro/Max subscription** rather than consuming pay-as-you-go API credits.
+
+This is an **optional dependency** — only needed if you want to use the `claude_code` adapter. Everything else works without it.
+
+```bash
+npm i -g @agentclientprotocol/claude-agent-acp
 ```
 
-Remember to set the corresponding API key as an environment variable if you are using a paid service like OpenAI, DeepSeek, or Anthropic. For example, for OpenAI, set `OPENAI_API_KEY`.
+Requirements and caveats:
+
+- Requires the [Claude Code CLI](https://github.com/anthropics/claude-code), already logged in (`claude`).
+- Claude Code treats `ANTHROPIC_API_KEY` as **taking precedence over your claude.ai login**. If that variable is exported in your shell, Neovim passes it down and the agent bills pay-as-you-go API credits instead of the subscription (failing with `Credit balance is too low` when the API account is empty). The adapter therefore launches the bridge with that key stripped from its environment; the HTTP adapters still receive it.
+- The bridge is a Node script (`#!/usr/bin/env node`, Node >= 22), so **Node must be on the `PATH` that Neovim inherits**. If it is not (a common surprise with `nvm`), set `CC_CLAUDE_ACP_CMD` in `.env` to an absolute path or a wrapper script.
+- **ACP drives the chat interaction only.** CodeCompanion's inline interaction and title generation both require an HTTP adapter. If you set `CC_DEFAULT_ADAPTER=claude_code`, those fall back to an HTTP adapter automatically; use `CC_INLINE_ADAPTER` / `CC_TITLE_ADAPTER` to point them at a provider you have credit with.
+
+You do not have to make it the default: leave `CC_DEFAULT_ADAPTER` as-is and simply switch to *Claude Code* from the adapter picker inside a chat buffer.
