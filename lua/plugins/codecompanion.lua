@@ -6,14 +6,11 @@ return {
     "ravitemer/codecompanion-history.nvim",
   },
   config = function()
-    -- CodeCompanion loads its builtin prompt library (/fix, /explain, /lsp,
-    -- /tests, ...) from markdown whose YAML frontmatter is parsed via the `yaml`
-    -- treesitter parser. That parser is a documented prerequisite (see
-    -- codecompanion's doc/installation.md). Without it, every builtin prompt is
-    -- rejected with "[Prompt Library] Missing frontmatter, name or interaction"
-    -- and aliases such as /fix report "Could not find `fix` in the prompt library".
-    -- `yaml` is declared in nvim-treesitter's ensure_installed, but on the `main`
-    -- branch a one-time parser install can be skipped, so ensure it here.
+    -- Ensure the treesitter `yaml` parser exists: CodeCompanion parses its
+    -- prompt-library frontmatter with it, and without it every builtin prompt
+    -- (/fix, /explain, ...) is rejected. On nvim-treesitter's `main` branch the
+    -- one-time install can be skipped, so ensure it here.
+    -- See docs/plugins/codecompanion/prerequisites.md.
     if not pcall(vim.treesitter.get_string_parser, "a: b", "yaml") then
       local ok_ts, ts = pcall(require, "nvim-treesitter")
       if ok_ts and type(ts.install) == "function" then
@@ -66,13 +63,10 @@ return {
     local title_model = os.getenv("CC_TITLE_MODEL")
     title_model = (title_model and title_model ~= "") and title_model or "claude-haiku-4-5-20251001"
 
-    -- ACP adapters (e.g. `claude_code`) are agent subprocesses, not HTTP endpoints:
-    -- CodeCompanion spawns `claude-agent-acp`, which drives the Claude Code CLI, so
-    -- Opus/Sonnet bill against the Claude subscription rather than API credits.
-    -- Opt in from `.env` with CC_DEFAULT_ADAPTER=claude_code (+ CC_DEFAULT_MODEL=opus).
-    -- They only drive CHAT. The inline interaction bails on `adapter.type ~= "http"`
-    -- and title generation is a plain HTTP request, so both must keep an HTTP adapter
-    -- or selecting an ACP chat adapter would break them.
+    -- ACP adapters (claude_code, pi) drive CHAT ONLY; inline bails on
+    -- `adapter.type ~= "http"` and title generation is a plain HTTP request.
+    -- `is_acp` lets those paths fall back to an HTTP adapter when the chat
+    -- default is ACP. See docs/plugins/codecompanion/acp-support.md.
     local function is_acp(name)
       if not name or name == "opts" or name == "extend" then
         return false
@@ -308,30 +302,19 @@ return {
           },
         },
         acp = {
-          -- Claude Code over ACP. Rather than calling an HTTP endpoint, CodeCompanion
-          -- spawns the `claude-agent-acp` bridge, which drives the Claude Code CLI --
-          -- so Opus/Sonnet run against a Claude Pro/Max *subscription* instead of
-          -- consuming API credits. Entirely optional: this is only ever used when
-          -- `.env` sets CC_DEFAULT_ADAPTER=claude_code, so the HTTP/proxy adapters
-          -- above remain the default and are unaffected.
-          --
-          -- Requires the bridge on PATH:
-          --   npm i -g @agentclientprotocol/claude-agent-acp
-          -- It is a node script (`#!/usr/bin/env node`), so node must also be on the
-          -- PATH that Neovim inherits. If it is not, set CC_CLAUDE_ACP_CMD to an
-          -- absolute path (or a wrapper script that loads node) instead.
+          -- Claude Code over ACP: spawns the `claude-agent-acp` bridge (drives
+          -- the Claude Code CLI) so Opus/Sonnet run against a Claude Pro/Max
+          -- subscription instead of API credits. Optional; used only when `.env`
+          -- sets CC_DEFAULT_ADAPTER=claude_code. Bridge override: CC_CLAUDE_ACP_CMD.
+          -- See docs/plugins/codecompanion/acp-support.md + prerequisites.md.
           claude_code = function()
             local cmd = os.getenv("CC_CLAUDE_ACP_CMD")
             cmd = (cmd and cmd ~= "") and cmd or "claude-agent-acp"
 
-            -- Claude Code treats ANTHROPIC_API_KEY as taking precedence over the
-            -- claude.ai login ("claude.ai connectors are disabled because
-            -- ANTHROPIC_API_KEY ... takes precedence over your claude.ai login").
-            -- Neovim inherits that key from the shell, so the bridge would bill
-            -- pay-as-you-go API credits instead of the subscription -- exactly what
-            -- this adapter exists to avoid, and it fails outright ("Credit balance
-            -- is too low") when the API account is empty. Strip the key from the
-            -- bridge's environment only; the HTTP adapters above still receive it.
+            -- Strip ANTHROPIC_API_KEY/ANTHROPIC_AUTH_TOKEN from the bridge's env
+            -- only (the HTTP adapters still receive them): Claude Code prefers
+            -- that key over the subscription login, so an inherited key would
+            -- bill API credits. See docs/plugins/codecompanion/acp-support.md.
             local strip = { "env", "-u", "ANTHROPIC_API_KEY", "-u", "ANTHROPIC_AUTH_TOKEN" }
             return require("codecompanion.adapters").extend("claude_code", {
               commands = {
@@ -339,6 +322,58 @@ return {
                 yolo = vim.list_extend(vim.deepcopy(strip), { cmd, "--yolo" }),
               },
             })
+          end,
+
+          -- Pi (the pi coding agent) over ACP, via the `pi-acp` bridge (spawns
+          -- `pi --mode rpc`). Pi owns its provider/model/auth, so there is NO
+          -- proxy plumbing and no secret read here (public-repo safe). CHAT ONLY.
+          -- Bridge override: CC_PI_ACP_CMD. Install + caveats:
+          -- docs/plugins/codecompanion/prerequisites.md + acp-support.md.
+          pi = function()
+            local cmd = os.getenv("CC_PI_ACP_CMD")
+            cmd = (cmd and cmd ~= "") and cmd or "pi-acp"
+            return {
+              name = "pi",
+              formatted_name = "Pi",
+              type = "acp",
+              roles = { llm = "assistant", user = "user" },
+              opts = { vision = true },
+              commands = {
+                default = { cmd },
+              },
+              defaults = {
+                mcpServers = {},
+                timeout = 20000,
+              },
+              parameters = {
+                protocolVersion = 1,
+                clientCapabilities = {
+                  fs = { readTextFile = true, writeTextFile = true },
+                },
+                clientInfo = {
+                  name = "CodeCompanion.nvim",
+                  version = "1.0.0",
+                },
+              },
+              handlers = {
+                setup = function(_self)
+                  return true
+                end,
+                -- Pi authenticates itself (pi config / `pi-acp --terminal-login`),
+                -- so there is no token to inject -- unlike claude_code.
+                auth = function(_self)
+                  return true
+                end,
+                form_messages = function(self, messages, capabilities)
+                  return require("codecompanion.adapters.acp.helpers").form_messages(
+                    self,
+                    messages,
+                    capabilities
+                  )
+                end,
+                on_exit = function(_self, _code) end,
+              },
+            }
           end,
         },
       },

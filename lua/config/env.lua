@@ -1,14 +1,12 @@
--- Minimal dotenv loader. Neovim/Lua has no built-in `dotenv` (unlike Scala or
--- Rust), but a `.env` is just KEY=VALUE lines, so we parse it ourselves and push
--- the values into the process environment via `vim.fn.setenv`. Every existing
--- `os.getenv(...)` call (e.g. in the CodeCompanion adapters) then keeps working.
+-- Minimal dotenv loader: Lua has no built-in dotenv, so parse the `.env`
+-- (KEY=VALUE lines) ourselves and push values into the environment via
+-- `vim.fn.setenv`, keeping every `os.getenv(...)` call working.
 --
--- The file is `~/.config/nvim/.env`, is gitignored, and holds machine-specific
--- choices (default adapter/model, proxy URLs, keys) that must NOT be committed.
--- See `.env.sample` for the documented template.
+-- `~/.config/nvim/.env` is gitignored and holds machine-specific choices
+-- (adapter/model, proxy URLs, keys). See `.env.sample` for the template and
+-- `docs/plugins/codecompanion/env-vars.md` for what each variable does.
 --
--- Precedence: a variable already exported by the shell WINS over the file, so a
--- machine that already exports these vars behaves exactly as before.
+-- Precedence: a variable already exported by the shell WINS over the file.
 
 local M = {}
 
