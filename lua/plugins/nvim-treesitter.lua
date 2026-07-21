@@ -49,7 +49,7 @@ return {
               if not vim.api.nvim_buf_is_valid(ev.buf) then
                 return
               end
-              vim.treesitter.start(ev.buf)
+              pcall(vim.treesitter.start, ev.buf)
               local ok, ts_move = pcall(require, "nvim-treesitter-textobjects.move")
               if not ok then
                 return
