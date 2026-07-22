@@ -11,6 +11,7 @@ return {
       "html",
       "wit",
       "javascript",
+      "java",
       "json",
       "lua",
       "markdown",
