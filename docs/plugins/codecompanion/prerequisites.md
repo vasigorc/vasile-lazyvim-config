@@ -48,5 +48,11 @@ The bridge just spawns whatever `pi` is on PATH — it does not bundle it. Insta
 the `pi` CLI separately (a system/Nix package, or
 `npm i -g @earendil-works/pi-coding-agent`) and make sure it is provider-configured.
 
+The config launches the global bridge through `scripts/pi-acp-codecompanion`. For
+Pi 0.80.4 and newer, this compatibility launcher makes pi-acp 0.0.31 wait for
+Pi's final `agent_settled` event. It automatically uses the unmodified bridge
+with older Pi releases, which do not emit that event. The launcher looks for a
+global pi-acp installation under pnpm first, then npm.
+
 > Some environments block global `npm`. `pnpm add -g` is the drop-in
 > replacement; the pnpm global bin dir must be on your PATH.

@@ -331,7 +331,9 @@ return {
           -- docs/plugins/codecompanion/prerequisites.md + acp-support.md.
           pi = function()
             local cmd = os.getenv("CC_PI_ACP_CMD")
-            cmd = (cmd and cmd ~= "") and cmd or "pi-acp"
+            -- pi-acp 0.0.31 completes ACP turns on `agent_end`, but pi >= 0.80.4
+            -- can retry/continue afterward. The local launcher waits for `agent_settled`.
+            cmd = (cmd and cmd ~= "") and cmd or (vim.fn.stdpath("config") .. "/scripts/pi-acp-codecompanion")
             return {
               name = "pi",
               formatted_name = "Pi",

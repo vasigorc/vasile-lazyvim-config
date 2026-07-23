@@ -1,0 +1,47 @@
+#!/bin/sh
+set -eu
+
+script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+package_root=${PI_ACP_PACKAGE_ROOT:-}
+
+if [ -z "$package_root" ]; then
+  if command -v pnpm >/dev/null 2>&1 && [ -f "$(pnpm root -g)/pi-acp/dist/index.js" ]; then
+    package_root="$(pnpm root -g)/pi-acp"
+  elif command -v npm >/dev/null 2>&1 && [ -f "$(npm root -g)/pi-acp/dist/index.js" ]; then
+    package_root="$(npm root -g)/pi-acp"
+  else
+    echo "pi-acp-codecompanion: cannot locate the global pi-acp package" >&2
+    exit 1
+  fi
+fi
+
+entry="$package_root/dist/index.js"
+if [ ! -f "$entry" ]; then
+  echo "pi-acp-codecompanion: pi-acp entrypoint not found: $entry" >&2
+  exit 1
+fi
+
+pi_command=${PI_ACP_PI_COMMAND:-pi}
+pi_version_output=$("$pi_command" --version 2>/dev/null || true)
+pi_version=$(printf '%s\n' "$pi_version_output" | awk '
+  match($0, /[0-9]+\.[0-9]+\.[0-9]+/) { print substr($0, RSTART, RLENGTH); exit }
+')
+if [ -z "$pi_version" ]; then
+  echo "pi-acp-codecompanion: cannot determine Pi version from: $pi_command --version" >&2
+  exit 1
+fi
+needs_settled=$(printf '%s\n' "$pi_version" | awk -F. '
+  (($1 + 0) > 0 || ($2 + 0) > 80 || (($2 + 0) == 80 && ($3 + 0) >= 4)) { print "yes"; next }
+  { print "no" }
+')
+
+# Older Pi versions do not emit agent_settled, and their agent_end event is final.
+if [ "$needs_settled" != "yes" ]; then
+  exec node "$entry" "$@"
+fi
+
+# pi >= 0.80.4 may emit agent_end before an automatic retry/continuation.
+# Patch the bridge at load time so ACP completes only after agent_settled.
+NODE_NO_WARNINGS=1 exec node \
+  --loader "$script_dir/pi-acp-agent-settled-loader.mjs" \
+  "$entry" "$@"
