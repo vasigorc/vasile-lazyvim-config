@@ -190,6 +190,9 @@ return {
           "-Dsun.zip.disableMemoryMapping=true",
           "-Xms256m",
           "-Xmx4g",
+          -- Lombok modifies JDT's compiler AST, so annotation processing alone is not enough.
+          -- Load Mason's bundled agent into the JDTLS JVM to expose generated members to the LSP.
+          "-javaagent:" .. vim.fn.stdpath("data") .. "/mason/packages/jdtls/lombok.jar",
           "--add-modules=ALL-SYSTEM",
           "--add-opens",
           "java.base/java.util=ALL-UNNAMED",
