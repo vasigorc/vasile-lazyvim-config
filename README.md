@@ -13,7 +13,7 @@ of both
 Please see installation requirements for LazyVim [here](http://www.lazyvim.org/#%EF%B8%8F-requirements).
 For installation of Neovim (>= version 0.9.0) refer to their [installation guide](https://github.com/neovim/neovim/blob/master/INSTALL.md)
 
-#### Additional recommendations / recommendations
+#### Additional recommendations
 
 - [nvim](https://github.com/neovim/neovim/blob/master/INSTALL.md) 
 - [lazygit](https://github.com/jesseduffield/lazygit?tab=readme-ov-file#installation)
@@ -66,24 +66,6 @@ rbenv global 3.4.8
 gem install rubocop sonargraph
 ```
 
-### Running inside `nix-shell`
-
-[Nix](https://nix.dev/index.html) is a package management tool for reproducible development environments.
-
-Make sure that you have Nix installed, by following the instruction steps [here](https://nix.dev/install-nix#install-nix).
-
-Clone [this repository](https://github.com/vasigorc/bash-utils/tree/main) and follow README steps in
-its [`nix` directory](https://github.com/vasigorc/bash-utils/tree/main/nix).
-
-For most basic Neovim setup you may run `nvim` inside `nix-shell` like such:
-
-```shell
-~/$PATH_TO_CLONED_REPO/bash-utils/nix/dynamic-nix-shell.sh nvim
-```
-
-Then you can add more modules following `nvim` in the previous command like `python` depending on
-your current project.
-
 ## How to use this setup
 
 Make sure that you have your [prerequistes](#prerequisites) and then follow the steps from [this page](http://www.lazyvim.org/installation).
@@ -129,11 +111,11 @@ cp .env.sample .env
 
 `.env` is gitignored and loaded at startup by `lua/config/env.lua`. It is a plain `KEY=VALUE` file; anything already exported by your shell takes precedence over it. The main knobs (all optional — see `.env.sample` for the full list):
 
-| Variable | Purpose |
-| --- | --- |
-| `CC_DEFAULT_ADAPTER` | Adapter for chat + inline (e.g. `deepseek`, `openai`, `ollama_qwen`, `claude_code`) |
-| `CC_DEFAULT_MODEL` | Model within that adapter |
-| `CC_TITLE_ADAPTER` / `CC_TITLE_MODEL` | Adapter/model for chat-history title generation |
+| Variable                              | Purpose                                                                             |
+| ------------------------------------- | ----------------------------------------------------------------------------------- |
+| `CC_DEFAULT_ADAPTER`                  | Adapter for chat + inline (e.g. `deepseek`, `openai`, `ollama_qwen`, `claude_code`) |
+| `CC_DEFAULT_MODEL`                    | Model within that adapter                                                           |
+| `CC_TITLE_ADAPTER` / `CC_TITLE_MODEL` | Adapter/model for chat-history title generation                                     |
 
 Leaving them unset keeps the defaults defined in `lua/plugins/codecompanion.lua`. Adapters that talk to a paid API still need their key exported (e.g. `DEEPSEEK_API_KEY`, `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`) — keep those in your shell (e.g. `~/.zshrc`), not in the repo.
 
@@ -154,4 +136,4 @@ Requirements and caveats:
 - The bridge is a Node script (`#!/usr/bin/env node`, Node >= 22), so **Node must be on the `PATH` that Neovim inherits**. If it is not (a common surprise with `nvm`), set `CC_CLAUDE_ACP_CMD` in `.env` to an absolute path or a wrapper script.
 - **ACP drives the chat interaction only.** CodeCompanion's inline interaction and title generation both require an HTTP adapter. If you set `CC_DEFAULT_ADAPTER=claude_code`, those fall back to an HTTP adapter automatically; use `CC_INLINE_ADAPTER` / `CC_TITLE_ADAPTER` to point them at a provider you have credit with.
 
-You do not have to make it the default: leave `CC_DEFAULT_ADAPTER` as-is and simply switch to *Claude Code* from the adapter picker inside a chat buffer.
+You do not have to make it the default: leave `CC_DEFAULT_ADAPTER` as-is and simply switch to _Claude Code_ from the adapter picker inside a chat buffer.
