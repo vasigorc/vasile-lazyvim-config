@@ -1,4 +1,15 @@
 #!/bin/sh
+#
+# TEMPORARY compatibility launcher around the globally installed pi-acp.
+# pi-acp 0.0.31 completes ACP turns on Pi's non-final `agent_end` event; for
+# Pi >= 0.80.4 this launcher patches it at load time to wait for `agent_settled`.
+#
+# WARNING: remove this machinery once https://github.com/svkozak/pi-acp/pull/79
+# (or an equivalent `agent_settled` fix) ships in a pi-acp release. The loader
+# is already a no-op against a fixed bridge; cleanup means deleting this script,
+# pi-acp-agent-settled-loader.mjs, tests/pi-acp-agent-settled*.test.mjs, and
+# restoring the plain `pi-acp` default in lua/plugins/codecompanion.lua.
+# See docs/plugins/codecompanion/acp-support.md ("Planned removal").
 set -eu
 
 script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)

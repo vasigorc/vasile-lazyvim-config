@@ -54,6 +54,15 @@ Regression check:
 node --test tests/pi-acp-agent-settled*.test.mjs
 ```
 
+> ⚠️ **Planned removal.** This launcher exists only because pi-acp 0.0.31
+> resolves ACP turns on `agent_end`. Upstream PR
+> [svkozak/pi-acp#79](https://github.com/svkozak/pi-acp/pull/79) moves completion
+> to `agent_settled`. Once a pi-acp release ships that fix, the loader detects
+> native `agent_settled` handling and becomes a no-op — at that point delete
+> `scripts/pi-acp-codecompanion`, `scripts/pi-acp-agent-settled-loader.mjs`,
+> `tests/pi-acp-agent-settled*.test.mjs`, and point the adapter default in
+> `lua/plugins/codecompanion.lua` back to plain `pi-acp`.
+
 Caveats (bridge is young, MVP centered on Zed):
 
 - No ACP `fs/*` or `terminal/*` delegation — pi reads/writes/executes locally.
