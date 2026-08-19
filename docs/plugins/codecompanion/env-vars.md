@@ -41,23 +41,14 @@ wins over `.env`, so a machine that already exports these behaves unchanged.
 
 `CC_PI_ACP_CMD`
 
-- Optional path to another `pi-acp` bridge binary. By default the config uses
-  `scripts/pi-acp-codecompanion`, a compatibility launcher around the globally
-  installed `pi-acp`. The launcher prevents pi-acp 0.0.31 from completing an ACP
-  turn on a non-final `agent_end` event from pi >= 0.80.4. An override bypasses
-  that compatibility fix, so use it only with a bridge that waits for
-  `agent_settled`.
-
-`PI_ACP_PACKAGE_ROOT`
-
-- Optional package-directory override used by the local Pi launcher. Normally it
-  discovers global pi-acp through pnpm, then npm. Set this only for a nonstandard
-  installation; the directory must contain `dist/index.js`.
+- Optional path to another `pi-acp` bridge binary. Defaults to `pi-acp` on
+  PATH. Requires pi-acp >= 0.0.33, which completes ACP turns on pi's final
+  `agent_settled` event instead of a possibly non-final `agent_end`.
 
 `PI_ACP_PI_COMMAND`
 
-- Optional path to the Pi executable used by both pi-acp and the compatibility
-  launcher's version check. Unset defaults to `pi` on PATH.
+- Optional path to the Pi executable used by pi-acp. Unset defaults to `pi`
+  on PATH.
 
 ## Proxy endpoints
 

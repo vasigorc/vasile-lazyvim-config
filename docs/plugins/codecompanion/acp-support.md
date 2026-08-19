@@ -39,29 +39,14 @@ so the adapter injects no token. Project skills, prompts and `CLAUDE.md` are
 loaded by `pi` itself. Because the adapter reads no secrets, it is safe to keep
 in a public config. Binary override: `CC_PI_ACP_CMD`.
 
-The default command is the local `scripts/pi-acp-codecompanion` compatibility
-launcher. Pi 0.80.4 added `agent_settled` because `agent_end` can precede an
-automatic retry, compaction retry, or queued continuation. pi-acp 0.0.31 still
-completes the ACP request on the first `agent_end`, which makes CodeCompanion
-return control while pi continues working invisibly. For Pi 0.80.4 and newer,
-the launcher patches pi-acp at load time to complete on `agent_settled`; it
-bypasses the patch on older Pi versions and becomes a no-op once the installed
-bridge handles that event itself.
-
-Regression check:
-
-```sh
-node --test tests/pi-acp-agent-settled*.test.mjs
-```
-
-> ⚠️ **Planned removal.** This launcher exists only because pi-acp 0.0.31
-> resolves ACP turns on `agent_end`. Upstream PR
-> [svkozak/pi-acp#79](https://github.com/svkozak/pi-acp/pull/79) moves completion
-> to `agent_settled`. Once a pi-acp release ships that fix, the loader detects
-> native `agent_settled` handling and becomes a no-op — at that point delete
-> `scripts/pi-acp-codecompanion`, `scripts/pi-acp-agent-settled-loader.mjs`,
-> `tests/pi-acp-agent-settled*.test.mjs`, and point the adapter default in
-> `lua/plugins/codecompanion.lua` back to plain `pi-acp`.
+Requires **pi-acp 0.0.33 or newer** with **Pi 0.80.4 or newer**. Pi 0.80.4
+added `agent_settled` because `agent_end` can precede an automatic retry,
+compaction retry, or queued continuation; pi-acp completes ACP turns on
+`agent_settled` since 0.0.33 ([svkozak/pi-acp#79](https://github.com/svkozak/pi-acp/pull/79)).
+Older pi-acp releases returned control to CodeCompanion on the first
+`agent_end` while pi kept working invisibly — this config shipped a temporary
+compatibility launcher for that window (removed once 0.0.33 was installed;
+see git history: `scripts/pi-acp-codecompanion`).
 
 Caveats (bridge is young, MVP centered on Zed):
 
