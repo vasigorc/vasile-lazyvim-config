@@ -427,5 +427,41 @@ return {
         },
       },
     })
+
+    -- WORKAROUND for a CodeCompanion ACP race (banner-only chats, dropped
+    -- responses). Chat-open fires an async connection warm-up and prompt
+    -- submit fires ensure_session; both can reach _establish_session
+    -- concurrently because wait_for_rpc_response uses vim.wait (which pumps
+    -- the event loop). Two session/new requests go out, the prompt binds to
+    -- the first session that resolves, then the second response overwrites
+    -- connection.session_id — so every subsequent session/update fails the
+    -- sessionId guard and is silently dropped. Pin the first established
+    -- session id and restore it if a concurrent duplicate clobbers it.
+    -- Diagnosed 2026-08-28 via scripts/pi-acp-tap; see wiki
+    -- methods/codecompanion-pi-acp-agent-settled.md. Remove once fixed
+    -- upstream (olimorris/codecompanion.nvim).
+    local acp_connection = require("codecompanion.acp")
+    local orig_establish = acp_connection._establish_session
+    function acp_connection:_establish_session()
+      self._estab_inflight = (self._estab_inflight or 0) + 1
+      if self._estab_inflight == 1 then
+        self._estab_first_sid = nil
+      end
+      local ok = orig_establish(self)
+      self._estab_inflight = self._estab_inflight - 1
+      if ok and self.session_id then
+        if not self._estab_first_sid then
+          self._estab_first_sid = self.session_id
+        elseif self.session_id ~= self._estab_first_sid then
+          require("codecompanion.utils.log"):warn(
+            "[acp-race-workaround] Concurrent duplicate session %s; keeping %s",
+            self.session_id,
+            self._estab_first_sid
+          )
+          self.session_id = self._estab_first_sid
+        end
+      end
+      return ok
+    end
   end,
 }
