@@ -437,9 +437,8 @@ return {
     -- connection.session_id — so every subsequent session/update fails the
     -- sessionId guard and is silently dropped. Pin the first established
     -- session id and restore it if a concurrent duplicate clobbers it.
-    -- Diagnosed 2026-08-28 via scripts/pi-acp-tap; see wiki
-    -- methods/codecompanion-pi-acp-agent-settled.md. Remove once fixed
-    -- upstream (olimorris/codecompanion.nvim).
+    -- Diagnosed 2026-08-28 via a JSON-RPC tap wrapper around the ACP agent
+    -- command. Remove once fixed upstream (olimorris/codecompanion.nvim).
     local acp_connection = require("codecompanion.acp")
     local orig_establish = acp_connection._establish_session
     function acp_connection:_establish_session()
