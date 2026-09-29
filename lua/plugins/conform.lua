@@ -9,6 +9,9 @@ return {
         java = { "google-java-format" },
         kotlin = { "ktlint" },
         nix = { "nixfmt" },
+        -- rustfmt directly rather than via rust-analyzer; reads the project's
+        -- rustfmt.toml and the edition from Cargo.toml
+        rust = { "rustfmt" },
         -- Ruby/ERB formatting
         ruby = { "rubocop" },
         eruby = { "erb_format" },
